@@ -1,0 +1,17 @@
+setup.py
+metreflip/DrumPad.py
+metreflip/Experiment.py
+metreflip/Grid.py
+metreflip/Rhythms.py
+metreflip/Screen.py
+metreflip/SequenceMemory.py
+metreflip/Stimulus.py
+metreflip/Trial.py
+metreflip/TrialData.py
+metreflip/Utilities.py
+metreflip/__init__.py
+metreflip.egg-info/PKG-INFO
+metreflip.egg-info/SOURCES.txt
+metreflip.egg-info/dependency_links.txt
+metreflip.egg-info/top_level.txt
+tests/test_rhythms.py
