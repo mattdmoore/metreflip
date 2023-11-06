@@ -1,6 +1,6 @@
 from metreflip import RHYTHMS
 from .Stimulus import *
-from .TrialData import TrialData
+from .TrialData import TestData, TrainData
 from psychopy import clock
 from random import random
 
@@ -46,13 +46,12 @@ class Trial:
             self.experiment.drum_pad.stop()
             taps.append([t.time for t in self.experiment.drum_pad.taps])
 
-        result = TrialData(participant_id=self.experiment.participant_id,
+        result = TrainData(participant_id=self.experiment.participant_id,
                            block_idx=block_idx,
                            trial_idx=trial_idx,
                            rhythm_idx=self.rhythm_idx,
                            rotation=self.parameters['rotation'],
                            metre=self.parameters['metre'],
-                           foil=self.parameters['foil'],
                            taps=taps)
         return result
 
@@ -88,20 +87,23 @@ class Trial:
         flip_interval = self.experiment.window.fixation_cross('Did you tap along with this rhythm before?\n\n\n')
         clock.wait(rhythm_loops * cycle_duration - flip_interval)
 
+        t0 = clock.getTime()
         correct_response = self.experiment.window.test_prompt(self.parameters['foil'])
+        reaction_time = clock.getTime() - t0
         self.experiment.drum_pad.stop()
         taps = [t.time for t in self.experiment.drum_pad.taps]
 
-        result = TrialData(participant_id=self.experiment.participant_id,
-                           block_idx=block_idx,
-                           trial_idx=trial_idx,
-                           rhythm_idx=self.rhythm_idx,
-                           rotation=self.parameters['rotation'],
-                           metre=metre_stimulus.beat,
-                           foil=self.parameters['foil'],
-                           taps=taps,
-                           invert=invert,
-                           correct_response=correct_response)
+        result = TestData(participant_id=self.experiment.participant_id,
+                          block_idx=block_idx,
+                          trial_idx=trial_idx,
+                          rhythm_idx=self.rhythm_idx,
+                          rotation=self.parameters['rotation'],
+                          metre=metre_stimulus.beat,
+                          foil=self.parameters['foil'],
+                          taps=taps,
+                          invert=invert,
+                          correct_response=correct_response,
+                          reaction_time=reaction_time)
         return result
 
 

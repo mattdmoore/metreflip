@@ -3,6 +3,7 @@ from .SequenceMemory import *
 from random import shuffle
 from dataclass_csv import DataclassWriter
 from psychopy import clock
+from pprint import pprint
 
 
 class Experiment:
@@ -15,17 +16,17 @@ class Experiment:
         self.iti = iti
         self.start_time = clock.getTime()
 
-    def run(self, memory_trials=3):
+    def run(self, memory_trials=2):
         self.window.welcome_screen()
         for block in self.blocks.items():
             if block[0] < 2:
                 train_data = self.train_block(block)
-                self.write_data(train_data, TrialData)
+                self.write_data(train_data, TrainData, skip_header=block[0])
             else:
                 memory_data = self.memory_block(memory_trials)
-                self.write_data(memory_data, MemoryData)
+                self.write_data(memory_data, MemoryData, skip_header=block[0])
             test_data = self.test_block(block)
-            self.write_data(test_data, TrialData, skip_header=block[0])
+            self.write_data(test_data, TestData, skip_header=block[0])
 
     def train_block(self, block):
         block_idx, trials = block
@@ -62,9 +63,17 @@ class Experiment:
         return memory_data
 
     def write_data(self, data, data_class, skip_header=False):
-        data_path = "data/" if data_class == TrialData else "data/memory/"
+        data_path = "data/"
+        match data_class.__qualname__:
+            case 'TrainData':
+                data_path += "train/"
+            case 'TestData':
+                data_path += "test/"
+            case 'MemoryData':
+                data_path += "memory/"
+
         with open(data_path + "participant_{}.csv".format(self.participant_id), "a") as f:
-            print(data)
+            pprint(data)
             w = DataclassWriter(f, data, data_class)
             w.write(skip_header=skip_header)
 

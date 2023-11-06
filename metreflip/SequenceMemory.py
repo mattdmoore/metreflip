@@ -23,6 +23,7 @@ class SequenceMemory:
         for square in self.grid.squares.values():
             square.setAutoDraw(False)
         return MemoryData(participant_id=self.experiment.participant_id,
+                          sequence=[s for s in self.sequence],
                           result=result,
                           start_time=start_time-self.experiment.start_time,
                           end_time=end_time-self.experiment.start_time)

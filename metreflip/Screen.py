@@ -25,7 +25,7 @@ class Screen(visual.Window):
 
         event.clearEvents()
         while not (key := event.getKeys()):
-            self.flip() if auto_flip else sleep(1 / poll_rate)
+            self.flip() if auto_flip else core.wait(1 / poll_rate)
 
         if (key := key[0]) in key_options.keys():
             if key_options[key] == 'close':

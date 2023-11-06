@@ -36,7 +36,7 @@ class Grid:
         return None
 
 
-class Square(visual.Rect):
+class Square(visual.rect.Rect):
     def __init__(self, window, brightness=-.2, *args, **kwargs):
         self.window = window
         self.brightness = (brightness,) * 3
