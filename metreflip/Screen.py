@@ -1,6 +1,5 @@
 from psychopy import visual, event, core
 from os import listdir
-from time import sleep
 
 
 class Screen(visual.Window):
@@ -51,57 +50,79 @@ class Screen(visual.Window):
             text = visual.TextStim(win=self,
                                    text=text,
                                    pos=[0, 0],
-                                   font='Roboto')
+                                   font='Roboto',
+                                   wrapWidth=2)
             text.draw()
         [line.draw() for line in fixation]
         self.flip()
         return self.getFutureFlipTime() - t
 
-    def welcome_screen(self, resume=False):
+    def welcome_screen(self):
         self.pages[0].draw()
         self.flip()
 
         self.keyboard_response(any_key=True)
-        return None if resume else self.instructions()
+        self.instructions('introduction')
 
-    def instructions(self):
+    def instructions(self, section, block=None):
         def clamp(x, lower, upper): return lower if x < lower else upper if x > upper else x
 
-        first, last = 1, 7
-        i = first
-        while True:
-            self.pages[i].draw()
-            self.flip()
+        page_dict = {
+            'introduction': (1, 9),
+            'break': 10,
+            'training': 13,
+            'testing': 15,
+            'memory': 21,
+        }
 
-            if (key := self.keyboard_response()) == 0 and i == last:
+        idx = page_dict[section]
+        match section:
+            case 'introduction':
+                first, last = idx
+                i = first
+                while True:
+                    self.pages[i].draw()
+                    self.flip()
+
+                    if (key := self.keyboard_response()) == 0 and i == last:
+                        self.flip()
+                        return
+                    i = clamp(i + key, first, last)
+
+            case 'break':
+                idx += block
+                self.pages[idx].draw()
                 self.flip()
-                return
-            i = clamp(i + key, first, last)
+                while self.keyboard_response() != 0:
+                    continue
 
-    def training(self):
-        self.pages[9].draw()
-        self.flip()
-        while self.keyboard_response() != 0:
-            continue
+            case 'training':
+                for i in range(2):
+                    self.pages[idx+i].draw()
+                    self.flip()
+                    while self.keyboard_response() != 0:
+                        continue
 
-    def testing(self, block):
-        self.pages[10 + block].draw()
-        self.flip()
-        while self.keyboard_response() != 0:
-            continue
+            case 'testing':
+                block_instructions = [(0, 2), (0, 3), (1, 3)]
+                for i in range(2):
+                    self.pages[idx+block_instructions[block][i]].draw()
+                    self.flip()
+                    while self.keyboard_response() != 0:
+                        continue
+
+            case _:
+                self.pages[idx].draw()
+                self.flip()
+                while self.keyboard_response() != 0:
+                    continue
 
     def test_prompt(self, foil):
-        self.pages[13].draw()
+        self.pages[20].draw()
         self.flip()
         while (key := self.keyboard_response()) not in (-1, 1):
             continue
         return (key > 0) == foil
-
-    def inter_block_break(self):
-        self.pages[8].draw()
-        self.flip()
-        while self.keyboard_response() != 0:
-            continue
 
     def callAfterFlip(self, function, *args, **kwargs):
         self._queue.append({'function': function,

@@ -24,9 +24,10 @@ class Experiment:
                 self.write_data(train_data, TrainData, skip_header=block[0])
             else:
                 memory_data = self.memory_block(memory_trials)
-                self.write_data(memory_data, MemoryData, skip_header=block[0])
+                self.write_data(memory_data, MemoryData)
             test_data = self.test_block(block)
             self.write_data(test_data, TestData, skip_header=block[0])
+            self.window.instructions('break', block[0])
 
     def train_block(self, block):
         block_idx, trials = block
@@ -34,7 +35,7 @@ class Experiment:
         trials = self.shuffle_trials(trials)
         train_data = []
 
-        self.window.training()
+        self.window.instructions('training')
         for trial_idx, (rhythm_idx, parameters) in enumerate(trials.items()):
             trial = Trial(self, rhythm_idx, parameters)
             data = trial.train(trial_idx=trial_idx + block_idx * len(trials),
@@ -47,7 +48,7 @@ class Experiment:
         trials = self.shuffle_trials(trials)
         test_data = []
 
-        self.window.testing(bool(block_idx))
+        self.window.instructions('testing', block_idx)
         for trial_idx, (rhythm_idx, parameters) in enumerate(trials.items()):
             trial = Trial(self, rhythm_idx, parameters)
             data = trial.test(trial_idx=trial_idx + block_idx * len(trials),
@@ -57,6 +58,7 @@ class Experiment:
 
     def memory_block(self, n=3):
         memory_data = []
+        self.window.instructions('memory')
         for _ in range(n):
             task = SequenceMemory(self)
             memory_data.append(task.run())
