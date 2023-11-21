@@ -20,15 +20,19 @@ def select_rhythms(participant_id):
     blocks = {key: apply_bitmask(pool, mask) for key, mask in enumerate((bitmask, inverse))}
 
     for b in blocks.values():
-        for i, val in enumerate(b.values()):
+        for i, (key, val) in enumerate(b.items()):
             if not val['foil']:
                 val['metre'] = 3 + ((participant_id + i) % 2)
                 val['invert'] = bool((participant_id + i // 2) % 2)
+            else:
+                val['invert'] = False
+            print(i, key, val)
 
     blocks[2] = deepcopy({**blocks[0], **blocks[1]})
-    for val in blocks[2].values():
-        if not val['foil']:
+    for i, (key, val) in enumerate(blocks[2].items()):
+        if ((i // 4) % 2 and (participant_id + i) % 2) or not val['foil']:
             val['invert'] = not val['invert']
+        print(i, key, val)
     return blocks
 
 

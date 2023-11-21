@@ -56,16 +56,21 @@ class Trial:
         return result
 
     def test(self, trial_idx, block_idx, metre_loops=4, rhythm_loops=4):
-        invert = self.parameters['invert'] if not self.parameters['foil'] else False
         ioi = self.experiment.base_ioi // self.parameters['metre']
 
-        null_metre_stimulus = MetreStimulus(self.parameters['metre'], ioi=ioi, null=True, invert=invert)
+        null_metre_stimulus = MetreStimulus(self.parameters['metre'],
+                                            ioi=ioi,
+                                            null=True,
+                                            invert=self.parameters['invert'])
         rhythm_stimulus = RhythmStimulus(self.rhythm, ioi=null_metre_stimulus.ioi)
 
         cycle_duration = null_metre_stimulus.ioi * len(self.rhythm) / 1e3
 
         if bool(block_idx):
-            metre_stimulus = MetreStimulus(self.parameters['metre'], ioi=ioi, invert=invert, fade_out=True)
+            metre_stimulus = MetreStimulus(self.parameters['metre'],
+                                           ioi=ioi,
+                                           invert=self.parameters['invert'],
+                                           fade_out=True)
 
             metre_stimulus.play()
             self.experiment.drum_pad.listen()
@@ -76,7 +81,9 @@ class Trial:
             flip_interval = self.experiment.window.fixation_cross('Imagine the beat\n\n\nDo not tap')
             clock.wait((metre_loops - 1) * cycle_duration - flip_interval)
         else:
-            metre_stimulus = MetreStimulus(self.parameters['metre'], ioi=ioi, invert=invert)
+            metre_stimulus = MetreStimulus(self.parameters['metre'],
+                                           ioi=ioi,
+                                           invert=self.parameters['invert'])
 
             metre_stimulus.play(loops=metre_loops)
             self.experiment.drum_pad.listen()
@@ -101,7 +108,7 @@ class Trial:
                           metre=metre_stimulus.beat,
                           foil=self.parameters['foil'],
                           taps=taps,
-                          invert=invert,
+                          invert=self.parameters['invert'],
                           correct_response=correct_response,
                           reaction_time=reaction_time)
         return result
